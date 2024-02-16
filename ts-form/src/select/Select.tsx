@@ -1,32 +1,50 @@
 import React, { useEffect, useState } from "react";
 import styles from "./Select.module.css";
 
-type SelectOption = {
+export type SelectOption = {
   label: string;
   value: string | number;
 };
 
-type SelectProps = {
-  options: SelectOption[];
+type SingleSelectProps = {
+  multiple?: false;
   onChange: (value: SelectOption | undefined) => void;
   value?: SelectOption;
 };
 
-const Select = ({ value, onChange, options }: SelectProps) => {
+type MultipleSelectProps = {
+  multiple: true;
+  onChange: (value: SelectOption[]) => void;
+  value: SelectOption[];
+};
+
+type SelectProps = {
+  options: SelectOption[];
+} & (SingleSelectProps | MultipleSelectProps);
+
+const Select = ({ value, onChange, options, multiple }: SelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
 
   const clearOptions = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
-    onChange(undefined);
+    multiple ? onChange([]) : onChange(undefined);
   };
 
   const selectOption = (option: SelectOption) => {
-    if (option !== value) onChange(option);
+    if (multiple) {
+      if (value.includes(option)) {
+        onChange(value.filter((o) => o !== option));
+      } else {
+        onChange([...value, option]);
+      }
+    } else {
+      if (option !== value) onChange(option);
+    }
   };
 
   function isOptionSelected(option: SelectOption) {
-    return option === value;
+    return multiple ? value.includes(option) : option === value;
   }
 
   useEffect(() => {
@@ -40,7 +58,23 @@ const Select = ({ value, onChange, options }: SelectProps) => {
       tabIndex={0}
       className={styles.container}
     >
-      <span className={styles.value}>{value?.label}</span>
+      <span className={styles.value}>
+        {multiple
+          ? value.map((item) => (
+              <button
+                key={item.value}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  selectOption(item);
+                }}
+                className={styles["option-badge"]}
+              >
+                {item.label}
+                <span className={styles["remove-btn"]}>&times;</span>
+              </button>
+            ))
+          : value?.label}
+      </span>
       <button onClick={(e) => clearOptions(e)} className={styles["clear-btn"]}>
         &times;
       </button>
