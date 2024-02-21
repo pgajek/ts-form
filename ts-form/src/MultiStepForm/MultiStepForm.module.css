@@ -1,0 +1,24 @@
+.formWrapper {
+  position: relative;
+  background: "white";
+  border: 1px solid #777;
+  padding: 2em;
+  margin: 1em auto;
+  border-radius: 10px;
+  max-width: max-content;
+  min-height: 273px;
+  box-sizing: border-box;
+}
+
+.stepsWrapper {
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+}
+
+.buttonsContainer {
+  margin-top: 1em;
+  display: flex;
+  gap: 0.5em;
+  justify-content: flex-end;
+}
